@@ -242,6 +242,7 @@
             transition: all var(--transition-smooth);
             position: relative;
             z-index: 1;
+            isolation: isolate;
         }
 
         .controls-card:hover {
@@ -410,7 +411,7 @@
             top: calc(100% + 8px);
             left: 0;
             right: 0;
-            z-index: 10000;
+            z-index: 10002;
             max-height: 0;
             overflow: hidden;
             opacity: 0;
@@ -460,6 +461,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: var(--spacing-xl);
+            position: relative;
+            z-index: 0;
         }
 
         /* Карточка штрихкода */
@@ -697,6 +700,33 @@
             .barcode-svg {
                 height: 140px;
                 min-height: 140px;
+            }
+
+            /* Отключаем hover на мобильных */
+            .barcode-card:hover {
+                box-shadow: var(--shadow-md);
+                transform: none;
+                border-color: var(--color-border);
+            }
+
+            .barcode-card:hover::before {
+                transform: scaleX(0);
+            }
+
+            /* Подсветка при попадании в область видимости */
+            .barcode-card.in-view {
+                box-shadow: var(--shadow-xl);
+                transform: translateY(-2px);
+                border-color: var(--color-brand);
+            }
+
+            .barcode-card.in-view::before {
+                transform: scaleX(1);
+            }
+
+            /* Делаем карточку фокусируемой */
+            .barcode-card {
+                outline: none;
             }
         }
 
@@ -1501,6 +1531,53 @@
         }
 
         // ========================================
+        // Подсветка карточек при скролле на мобильных
+        // ========================================
+        
+        /**
+         * Инициализирует отслеживание видимости карточек на мобильных
+         */
+        function initCardVisibilityObserver() {
+            if (window.innerWidth <= 768) {
+                const cards = document.querySelectorAll('.barcode-card');
+                
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '-20% 0px -20% 0px',
+                    threshold: 0.5
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('in-view');
+                        } else {
+                            entry.target.classList.remove('in-view');
+                        }
+                    });
+                }, observerOptions);
+
+                cards.forEach(card => {
+                    observer.observe(card);
+                });
+
+                // Обновляем при изменении размера окна
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768) {
+                        cards.forEach(card => {
+                            card.classList.remove('in-view');
+                            observer.unobserve(card);
+                        });
+                    } else if (window.innerWidth <= 768) {
+                        cards.forEach(card => {
+                            observer.observe(card);
+                        });
+                    }
+                });
+            }
+        }
+
+        // ========================================
         // Инициализация при загрузке
         // ========================================
         
@@ -1516,6 +1593,9 @@
             
             // Инициализация модального окна
             initImageModal();
+            
+            // Инициализация отслеживания видимости карточек
+            initCardVisibilityObserver();
             
             // Генерируем начальные штрихкоды
             updateBarcodes();
