@@ -633,6 +633,8 @@
             display: block;
             max-height: 80vh;
             object-fit: contain;
+            transition: opacity var(--transition-base);
+            opacity: 1;
         }
 
         .barcode-display {
@@ -1479,9 +1481,36 @@
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
             
-            modalImage.src = imagePath;
+            // Скрываем изображение и очищаем старый src
+            modalImage.style.opacity = '0';
+            modalImage.src = '';
+            
+            // Показываем модальное окно
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
+            
+            // Устанавливаем новый src и показываем после загрузки
+            setTimeout(() => {
+                // Удаляем старый обработчик, если есть
+                modalImage.onload = null;
+                modalImage.onerror = null;
+                
+                // Устанавливаем новый src
+                modalImage.src = imagePath;
+                
+                // Обработчик загрузки
+                const showImage = () => {
+                    modalImage.style.opacity = '1';
+                };
+                
+                modalImage.onload = showImage;
+                modalImage.onerror = showImage; // Показываем даже при ошибке
+                
+                // Fallback на случай, если изображение уже загружено из кеша
+                if (modalImage.complete && modalImage.naturalWidth > 0) {
+                    showImage();
+                }
+            }, 50);
         }
 
         /**
@@ -1489,8 +1518,16 @@
          */
         function closeImageModal() {
             const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
             modal.classList.remove('show');
             document.body.style.overflow = '';
+            
+            // Очищаем изображение после закрытия
+            setTimeout(() => {
+                modalImage.src = '';
+                modalImage.style.opacity = '0';
+            }, 350);
         }
 
         /**
