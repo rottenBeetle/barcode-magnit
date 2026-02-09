@@ -1071,7 +1071,7 @@
                         <div class="barcode-container">
                             <svg id="barcode-tb" class="barcode-svg"></svg>
                             <div class="barcode-value-wrapper">
-                                <div class="barcode-value" id="value-tb" spellcheck="false">ТВ1113123</div>
+                                <div class="barcode-value" id="value-tb" spellcheck="false">TB1113123</div>
                                 <button class="barcode-copy-btn" data-copy-target="value-tb" aria-label="Копировать">
                                     <span class="material-icons">content_copy</span>
                                 </button>
@@ -1095,7 +1095,7 @@
                         <div class="barcode-container">
                             <svg id="barcode-utch" class="barcode-svg"></svg>
                             <div class="barcode-value-wrapper">
-                                <div class="barcode-value" id="value-utch" spellcheck="false">ТВ3318465</div>
+                                <div class="barcode-value" id="value-utch" spellcheck="false">TB3318465</div>
                                 <button class="barcode-copy-btn" data-copy-target="value-utch" aria-label="Копировать">
                                     <span class="material-icons">content_copy</span>
                                 </button>
@@ -1184,12 +1184,12 @@
         }
 
         /**
-         * Возвращает настройки для JsBarcode в зависимости от размера экрана
+         * Возвращает настройки для JsBarcode в зависимости от размера экрана и формата
          */
-        function getBarcodeOptions() {
+        function getBarcodeOptions(format = "CODE128") {
             const isMobile = window.innerWidth <= 768;
             return {
-                format: "CODE128",
+                format: format,
                 width: isMobile ? 3 : 4,
                 height: isMobile ? 140 : 180,
                 displayValue: false,
@@ -1202,23 +1202,24 @@
          * Обновляет все три штрихкода новыми значениями
          */
         function updateBarcodes() {
-            const options = getBarcodeOptions();
-            
-            // Генерация и отображение ТТ
+            // Генерация и отображение ТТ (CODE128)
             const ttValue = generateTT();
-            JsBarcode("#barcode-tt", ttValue, options);
+            const ttOptions = getBarcodeOptions("CODE128");
+            JsBarcode("#barcode-tt", ttValue, ttOptions);
             document.getElementById('value-tt').textContent = ttValue;
 
-            // Генерация и отображение ТБ
+            // Генерация и отображение ТБ (CODE39)
             const tbNumber = getRandomFromArray(TB_NUMBERS);
-            const tbValue = `ТВ${tbNumber}`;
-            JsBarcode("#barcode-tb", tbValue, options);
+            const tbValue = `TB${tbNumber}`;
+            const tbOptions = getBarcodeOptions("CODE39");
+            JsBarcode("#barcode-tb", tbValue, tbOptions);
             document.getElementById('value-tb').textContent = tbValue;
 
-            // Генерация и отображение УТЧ
+            // Генерация и отображение УТЧ (CODE39)
             const utchNumber = getRandomFromArray(UTCH_NUMBERS);
-            const utchValue = `ТВ${utchNumber}`;
-            JsBarcode("#barcode-utch", utchValue, options);
+            const utchValue = `TB${utchNumber}`;
+            const utchOptions = getBarcodeOptions("CODE39");
+            JsBarcode("#barcode-utch", utchValue, utchOptions);
             document.getElementById('value-utch').textContent = utchValue;
         }
 
