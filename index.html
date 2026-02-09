@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Генератор штрихкодов — Магнит</title>
-    <link rel="icon" type="image/png" href="icons/logo_mgnt.png" id="favicon">
+    <!-- Preload favicon и логотип для быстрой загрузки (без высокого приоритета, чтобы не блокировать критический контент) -->
+    <link rel="preload" as="image" href="icons/logo_mgnt.png" type="image/png">
+    <!-- Favicon с несколькими размерами для лучшей поддержки -->
+    <link rel="icon" type="image/png" href="icons/logo_mgnt.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="icons/logo_mgnt.png" sizes="16x16">
+    <link rel="shortcut icon" type="image/png" href="icons/logo_mgnt.png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -975,7 +980,7 @@
         <div class="navbar-content">
             <div class="navbar-left">
                 <div class="navbar-logo">
-                    <img src="icons/logo_mgnt.png" alt="Магнит" id="navbarLogo">
+                    <img src="icons/logo_mgnt.png" alt="Магнит" id="navbarLogo" loading="eager" decoding="async">
                 </div>
             </div>
             <div class="navbar-actions">
@@ -1066,7 +1071,7 @@
                         <div class="barcode-container">
                             <svg id="barcode-tb" class="barcode-svg"></svg>
                             <div class="barcode-value-wrapper">
-                                <div class="barcode-value" id="value-tb" spellcheck="false">1113123</div>
+                                <div class="barcode-value" id="value-tb" spellcheck="false">ТВ1113123</div>
                                 <button class="barcode-copy-btn" data-copy-target="value-tb" aria-label="Копировать">
                                     <span class="material-icons">content_copy</span>
                                 </button>
@@ -1090,7 +1095,7 @@
                         <div class="barcode-container">
                             <svg id="barcode-utch" class="barcode-svg"></svg>
                             <div class="barcode-value-wrapper">
-                                <div class="barcode-value" id="value-utch" spellcheck="false">3318465</div>
+                                <div class="barcode-value" id="value-utch" spellcheck="false">ТВ3318465</div>
                                 <button class="barcode-copy-btn" data-copy-target="value-utch" aria-label="Копировать">
                                     <span class="material-icons">content_copy</span>
                                 </button>
@@ -1125,7 +1130,18 @@
         const TB_NUMBERS = [
             '1113123', '1120694', '1003303', '1116570', '1134811', '1126289', 
             '1142074', '1170923', '1006347', '1117786', '1011642', '1039954', 
-            '1129710', '1159574', '1170912', '1170515'
+            '1129710', '1159574', '1170912', '1170515',
+            '1443631', '1457552', '1461989', '1465473', '2910820', '2389943', 
+            '1456293', '2837416', '1463629', '2003706', '2631264', '3887149',
+            '1171985', '1171831', '1042265', '1316093', '1030823', '1048558', 
+            '1021271', '1057267', '1175976', '1059064', '1050926', '1055190', 
+            '1033862', '1036451', '1007453', '1430543',
+            '1037319', '1034408', '1045571', '1047089', '1071705', '1009040', 
+            '1048494', '1033302', '1044533', '1046204', '1048156', '1000888', 
+            '1172550', '1047437',
+            '1040934', '1043232', '1034842', '1034160', '1040377', '1035725', 
+            '1042101', '1042457', '1036239', '1038681', '1038854', '1043303', 
+            '1040567', '1042631'
         ];
 
         const UTCH_NUMBERS = [
@@ -1194,12 +1210,14 @@
             document.getElementById('value-tt').textContent = ttValue;
 
             // Генерация и отображение ТБ
-            const tbValue = getRandomFromArray(TB_NUMBERS);
+            const tbNumber = getRandomFromArray(TB_NUMBERS);
+            const tbValue = `ТВ${tbNumber}`;
             JsBarcode("#barcode-tb", tbValue, options);
             document.getElementById('value-tb').textContent = tbValue;
 
             // Генерация и отображение УТЧ
-            const utchValue = getRandomFromArray(UTCH_NUMBERS);
+            const utchNumber = getRandomFromArray(UTCH_NUMBERS);
+            const utchValue = `ТВ${utchNumber}`;
             JsBarcode("#barcode-utch", utchValue, options);
             document.getElementById('value-utch').textContent = utchValue;
         }
@@ -1355,17 +1373,7 @@
                 icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
             }
             
-            // Логотип всегда один и тот же
-            const navbarLogo = document.getElementById('navbarLogo');
-            if (navbarLogo) {
-                navbarLogo.src = 'icons/logo_mgnt.png';
-            }
-            
-            // Favicon всегда один и тот же
-            const favicon = document.getElementById('favicon');
-            if (favicon) {
-                favicon.href = 'icons/logo_mgnt.png';
-            }
+            // Логотип и favicon не меняются, поэтому не трогаем их (избегаем перезагрузки)
         }
 
         // ========================================
