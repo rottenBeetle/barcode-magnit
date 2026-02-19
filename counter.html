@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Счетчик посетителей — Магнит</title>
+    <!-- Preload favicon и логотип для быстрой загрузки -->
+    <link rel="preload" as="image" href="icons/logo_mgnt.png" type="image/png">
+    <!-- Favicon с несколькими размерами для лучшей поддержки -->
+    <link rel="icon" type="image/png" href="icons/logo_mgnt.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="icons/logo_mgnt.png" sizes="16x16">
+    <link rel="shortcut icon" type="image/png" href="icons/logo_mgnt.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Цветовая палитра — светлая тема */
+            --color-bg: #fafafa;
+            --color-bg-elevated: #ffffff;
+            --color-surface: #ffffff;
+            --color-text: #0a0a0a;
+            --color-text-secondary: #666666;
+            --color-text-tertiary: #999999;
+            --color-border: #e5e5e5;
+            --color-border-light: #f0f0f0;
+            
+            /* Брендовые цвета Магнит */
+            --color-brand: #e31e24;
+            --color-brand-hover: #c71a1f;
+            --color-brand-light: #ff3b41;
+            
+            /* Акцентные цвета */
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            
+            /* Градиенты */
+            --gradient-brand: linear-gradient(135deg, #e31e24 0%, #ff3b41 100%);
+            --gradient-overlay: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.03) 100%);
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            /* Радиусы */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            
+            /* Тени */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+            --shadow-brand: 0 8px 24px rgba(227, 30, 36, 0.25);
+            
+            /* Переходы */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Высота navbar */
+            --navbar-height: 70px;
+        }
+
+        /* Темная тема */
+        [data-theme="dark"] {
+            --color-bg: #0a0a0a;
+            --color-bg-elevated: #141414;
+            --color-surface: #1a1a1a;
+            --color-text: #ffffff;
+            --color-text-secondary: #a3a3a3;
+            --color-text-tertiary: #737373;
+            --color-border: #262626;
+            --color-border-light: #1f1f1f;
+            
+            --color-brand: #ff3b41;
+            --color-brand-hover: #ff5258;
+            --color-brand-light: #ff696e;
+            
+            --gradient-overlay: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 100%);
+            
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7), 0 4px 6px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.8), 0 10px 10px rgba(0, 0, 0, 0.6);
+            --shadow-brand: 0 8px 24px rgba(255, 59, 65, 0.3);
+        }
+
+        /* Базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color var(--transition-smooth), color var(--transition-smooth);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            height: var(--navbar-height);
+            background: var(--color-bg-elevated);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transition: all var(--transition-smooth);
+        }
+
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 var(--spacing-xl);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform var(--transition-base);
+            text-decoration: none;
+        }
+
+        .navbar-logo:hover {
+            transform: scale(1.02);
+        }
+
+        .navbar-logo img {
+            height: 56px;
+            width: auto;
+            transition: opacity var(--transition-base);
+        }
+
+        .navbar-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ff1a1a;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* Кнопка переключения темы */
+        .btn-theme {
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-brand);
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+            position: relative;
+        }
+
+        .btn-theme:hover {
+            transform: rotate(15deg) scale(1.05);
+        }
+
+        .btn-theme:active {
+            transform: rotate(15deg) scale(0.95);
+        }
+
+        .btn-theme .material-icons {
+            font-size: 22px;
+            color: var(--color-brand);
+        }
+
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            width: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2xl);
+            align-items: center;
+        }
+
+        /* Карточка счетчика */
+        .counter-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-3xl);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            text-align: center;
+        }
+
+        .counter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-brand);
+            transform: scaleX(1);
+        }
+
+        .counter-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
+        }
+
+        .counter-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-brand);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-xl);
+            color: white;
+        }
+
+        .counter-icon .material-icons {
+            font-size: 48px;
+        }
+
+        .counter-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .counter-description {
+            font-size: 16px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .counter-value {
+            font-size: 72px;
+            font-weight: 900;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: var(--spacing-xl) 0;
+            line-height: 1;
+            transition: all var(--transition-base);
+        }
+
+        .counter-value.loading {
+            opacity: 0.5;
+            font-size: 48px;
+        }
+
+        .counter-label {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .counter-info {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-tertiary);
+        }
+
+        /* Кнопка */
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+            text-decoration: none;
+            color: white;
+            background: var(--gradient-brand);
+            box-shadow: var(--shadow-brand);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(227, 30, 36, 0.35);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 768px) {
+            :root {
+                --navbar-height: 64px;
+            }
+
+            .navbar-content {
+                padding: 0 var(--spacing-lg);
+            }
+
+            .navbar-logo img {
+                height: 48px;
+            }
+
+            .navbar-title {
+                font-size: 18px;
+            }
+
+            .counter-card {
+                padding: var(--spacing-xl);
+            }
+
+            .counter-value {
+                font-size: 56px;
+            }
+
+            .counter-title {
+                font-size: 24px;
+            }
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-brand);
+        }
+
+        /* Анимация появления */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp var(--transition-smooth) ease-out;
+        }
+
+        /* Анимация счетчика */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .counter-value.updated {
+            animation: pulse 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-left">
+                <a href="index.html" class="navbar-logo">
+                    <img src="icons/logo_mgnt.png" alt="Магнит" id="navbarLogo" loading="eager" decoding="async">
+                </a>
+                <div class="navbar-title">Счетчик посетителей</div>
+            </div>
+            <div class="navbar-actions">
+                <button class="btn-theme" id="themeToggle" aria-label="Переключить тему">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <div class="counter-card fade-in-up">
+                <div class="counter-icon">
+                    <span class="material-icons">people</span>
+                </div>
+                <h1 class="counter-title">Всего посетителей</h1>
+                <p class="counter-description">Количество уникальных посещений сайта</p>
+                <div class="counter-value loading" id="counterValue">...</div>
+                <div class="counter-label">Посетителей</div>
+                <div class="counter-info">
+                    Счетчик обновляется автоматически при каждом посещении
+                </div>
+            </div>
+            <a href="index.html" class="btn fade-in-up">
+                <span class="material-icons">arrow_back</span>
+                Вернуться на главную
+            </a>
+        </div>
+    </main>
+
+    <!-- Футер -->
+    <footer style="text-align: center; padding: var(--spacing-lg); color: var(--color-text-secondary); font-size: 14px;">
+        by <a href="https://t.me/serjBcps" target="_blank" rel="noopener noreferrer" style="color: var(--color-brand); text-decoration: none; font-weight: 500;">Sergey Shitov</a>
+    </footer>
+
+    <script>
+        // ========================================
+        // Счетчик посетителей
+        // ========================================
+        
+        // Используем CountAPI для глобального счетчика
+        const COUNTER_API_KEY = 'barcode-magnit-visitors';
+        const COUNTER_API_URL = `https://api.countapi.xyz/hit/${COUNTER_API_KEY}`;
+        
+        // Fallback на localStorage если API недоступен
+        const STORAGE_KEY = 'visitor_count';
+        
+        /**
+         * Форматирует число с разделителями тысяч
+         */
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+        
+        /**
+         * Обновляет значение счетчика на странице
+         */
+        function updateCounter(value) {
+            const counterElement = document.getElementById('counterValue');
+            if (counterElement) {
+                const oldValue = parseInt(counterElement.textContent.replace(/\s/g, '')) || 0;
+                counterElement.textContent = formatNumber(value);
+                counterElement.classList.remove('loading');
+                
+                if (oldValue > 0 && oldValue !== value) {
+                    counterElement.classList.add('updated');
+                    setTimeout(() => {
+                        counterElement.classList.remove('updated');
+                    }, 500);
+                }
+            }
+        }
+        
+        /**
+         * Получает счетчик из API
+         */
+        async function fetchCounterFromAPI() {
+            try {
+                const response = await fetch(COUNTER_API_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.value || 0;
+                }
+            } catch (error) {
+                console.warn('Не удалось получить счетчик из API:', error);
+            }
+            return null;
+        }
+        
+        /**
+         * Получает счетчик из localStorage
+         */
+        function getCounterFromStorage() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    return parseInt(stored);
+                }
+            } catch (error) {
+                console.warn('Не удалось получить счетчик из localStorage:', error);
+            }
+            return 0;
+        }
+        
+        /**
+         * Сохраняет счетчик в localStorage
+         */
+        function saveCounterToStorage(value) {
+            try {
+                localStorage.setItem(STORAGE_KEY, value.toString());
+            } catch (error) {
+                console.warn('Не удалось сохранить счетчик в localStorage:', error);
+            }
+        }
+        
+        /**
+         * Инициализирует счетчик
+         */
+        async function initCounter() {
+            // Показываем загрузку
+            const counterElement = document.getElementById('counterValue');
+            if (counterElement) {
+                counterElement.textContent = '...';
+                counterElement.classList.add('loading');
+            }
+            
+            // Пытаемся получить счетчик из API
+            let count = await fetchCounterFromAPI();
+            
+            // Если API недоступен, используем localStorage
+            if (count === null) {
+                count = getCounterFromStorage();
+                count += 1; // Увеличиваем локальный счетчик
+                saveCounterToStorage(count);
+            }
+            
+            // Обновляем отображение
+            updateCounter(count);
+        }
+        
+        // ========================================
+        // Переключение темы
+        // ========================================
+        
+        /**
+         * Инициализирует тему при загрузке страницы
+         */
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            let theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon(theme);
+        }
+        
+        /**
+         * Переключает тему между светлой и темной
+         */
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+        
+        /**
+         * Обновляет иконку темы
+         */
+        function updateThemeIcon(theme) {
+            const icon = document.querySelector('#themeToggle .material-icons');
+            if (icon) {
+                icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+            }
+        }
+        
+        // ========================================
+        // Инициализация при загрузке
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализация темы
+            initTheme();
+            
+            // Инициализация счетчика
+            initCounter();
+            
+            // Привязываем обработчик переключения темы
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+        });
+    </script>
+</body>
+</html>

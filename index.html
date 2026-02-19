@@ -190,7 +190,7 @@
             gap: var(--spacing-sm);
         }
 
-        /* Кнопка переключения темы */
+        /* Кнопка переключения темы и другие действия */
         .btn-theme {
             width: 44px;
             height: 44px;
@@ -204,6 +204,17 @@
             border-radius: var(--radius-md);
             transition: all var(--transition-base);
             position: relative;
+            text-decoration: none;
+        }
+        
+        .btn-theme a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
 
         .btn-theme:hover {
